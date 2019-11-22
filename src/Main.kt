@@ -6,28 +6,110 @@ fun main() {
 
     val cards = ArrayList<GraphicsCard>()
 
+    // Generate 100 cards
     for (i in 1..100) {
         cards.add(generateNvidiaCard())
     }
 
+    // Sort cards by generation
     cards.sortByDescending {
         it.generation
     }
 
     println("Done! Here are your cards:\n")
 
+    // Print out the card details
     cards.forEach {
         println(it.toString())
     }
+
+    println("\nI'm also going to give you some processors.")
+
+    val processors = ArrayList<CPU>()
+
+    for (i in 1..20) {
+        processors.add(generateRyzenProcessor())
+    }
+
+    println("Here you go!\n")
+
+    processors.sortedBy { it.generation }.sortedBy { it.tier }.forEach {
+        println(it)
+    }
 }
 
-val manufacturers = arrayListOf("Palit", "ASUS", "EVGA", "MSI", "Gigabyte", "Zotac", "PNY")
-val initializers = arrayListOf("GT ", "GTX", "RTX")
-val generations = arrayListOf(7, 9, 10, 16, 20)
-val tiers = arrayListOf(10, 30, 50, 60, 70, 80, 90)
-val extensions = arrayListOf("Ti", "Super")
+
+fun generateRyzenProcessor(): CPU {
+    val tiers = arrayListOf(3, 5, 7, 9)
+    val generations = arrayListOf(1, 2, 3)
+    val extensions = arrayListOf("", "X", "G", "GE")
+
+    var tier = tiers.shuffled().random()
+    var generation = generations.shuffled().random()
+
+    while ((generation < 3 && tier > 7)) {
+        tier = tiers.shuffled().random()
+        generation = generations.shuffled().random()
+    }
+
+    val serial = when (tier) {
+        3 -> when {
+            generation < 3 && Random.nextBoolean() -> 300
+            else -> 200
+        }
+
+        5 -> when {
+            Random.nextBoolean() -> 400
+            Random.nextBoolean() -> 500
+            else -> 600
+        }
+
+        7 -> if (Random.nextBoolean() || generation == 2) 700 else 800
+
+        9 -> if (Random.nextBoolean()) 900 else 950
+
+        else -> 0
+    }
+
+    val extension = when (tier) {
+        3 -> when {
+            serial == 200 && generation < 2 -> ""
+            serial == 200 && generation > 1 -> "G"
+            serial == 300 -> "X"
+            else -> ""
+        }
+
+        5 -> when {
+            generation < 2 && serial == 400 -> ""
+            generation > 1 && serial == 400 -> "G"
+            generation < 3 && serial == 500 -> "X"
+            serial == 600 || (generation > 2 && serial == 500) -> if (Random.nextBoolean()) "X" else ""
+            else -> ""
+        }
+
+        7 -> if ((generation > 2 || serial > 700) || Random.nextBoolean()) "X" else ""
+
+        9 -> if (serial == 900 && Random.nextBoolean()) "" else "X"
+
+        else -> ""
+    }
+
+
+    return CPU(
+        company = "AMD",
+        series = "Ryzen",
+        tier = tier,
+        generation = generation,
+        serial = serial,
+        extension = extension
+    )
+}
 
 fun generateNvidiaCard(): GraphicsCard {
+    val manufacturers = arrayListOf("Palit", "ASUS", "EVGA", "MSI", "Gigabyte", "Zotac", "PNY")
+    val generations = arrayListOf(7, 9, 10, 16, 20)
+    val tiers = arrayListOf(10, 30, 50, 60, 70, 80, 90)
+
     // Get random GPU manufacturer
     val manufacturer = manufacturers.shuffled().random()
 
