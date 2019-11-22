@@ -27,13 +27,14 @@ fun main() {
 
     val processors = ArrayList<CPU>()
 
-    for (i in 1..20) {
+    for (i in 1..25) {
         processors.add(generateRyzenProcessor())
+        processors.add(generateIntelProcessor())
     }
 
     println("Here you go!\n")
 
-    processors.sortedBy { it.generation }.sortedBy { it.tier }.forEach {
+    processors.sortedBy { it.company }.forEach {
         println(it)
     }
 }
@@ -102,6 +103,34 @@ fun generateRyzenProcessor(): CPU {
         generation = generation,
         serial = serial,
         extension = extension
+    )
+}
+
+fun generateIntelProcessor(): CPU {
+    val tiers = arrayListOf(3, 5, 7, 9)
+    val generations = arrayListOf(2, 3, 4, 5, 6, 7, 8, 9)
+    val extensions = arrayListOf("", "K", "KF", "F")
+
+    var tier = tiers.random()
+    var generation = generations.random()
+
+    while (tier > 7 && generation < 9) {
+        tier = tiers.random()
+        generation = generations.random()
+    }
+
+    val serial = when (tier) {
+        9 -> (90 + Random.nextInt(9)) * 10
+        else -> Random.nextInt(99) * 10
+    }
+
+    return CPU(
+        company = "Intel",
+        series = "Core i",
+        tier = tier,
+        generation = generation,
+        serial = serial,
+        extension = extensions.random()
     )
 }
 
